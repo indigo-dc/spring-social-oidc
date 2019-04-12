@@ -15,7 +15,7 @@ Maven is needed to build the source code. To build a binary just execute `mvn cl
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
 
             connectionFactoryConfigurer.addConnectionFactory(
-                    new IndigoDCConnectionFactory(issuer, client-id, client-secret"));
+                    new OidcConnectionFactory(issuer, client-id, client-secret"));
     }
 ```
 
@@ -33,5 +33,5 @@ private ConnectionRepository connRepository;
 
 - Access the tokens with the following snippet:
 ```java
-connRepository.getPrimaryConnection(IndigoDC.class).createData()
+connRepository.getPrimaryConnection(Oidc.class).createData()
 ``` 

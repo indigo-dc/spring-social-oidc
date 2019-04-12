@@ -89,7 +89,7 @@ cmake-build-*/
 # IntelliJ
 out/
 *.iml
-.idea
+.idea/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -120,3 +120,5 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+/.idea/
+/.idea/libraries/
