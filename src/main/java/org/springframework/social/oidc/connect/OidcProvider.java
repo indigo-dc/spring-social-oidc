@@ -13,6 +13,7 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
   private static final Log logger = LogFactory.getLog(OidcProvider.class);
 
   private OidcConfiguration configuration;
+  private String orchestratorUrl;
 
   /**
    * Creates a OIDC provider configuration.
@@ -21,8 +22,10 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
    * @param clientId Client ID to use.
    * @param clientSecret Client Secret to use.
    */
-  public OidcProvider(String providerUrl, String clientId, String clientSecret) {
+  public OidcProvider(
+      String orchestratorUrl, String providerUrl, String clientId, String clientSecret) {
     super(createOidc2Template(providerUrl, clientId, clientSecret));
+    this.orchestratorUrl = orchestratorUrl;
     configuration =
         ((org.springframework.social.oidc.connect.OidcTemplate) getOAuthOperations())
             .getConfiguration();
@@ -52,6 +55,6 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
   }
 
   public Oidc getApi(String accessToken) {
-    return new OidcTemplate(configuration, accessToken);
+    return new OidcTemplate(orchestratorUrl, configuration, accessToken);
   }
 }

@@ -5,7 +5,11 @@ import org.springframework.social.oidc.api.Oidc;
 
 public class OidcConnectionFactory extends OAuth2ConnectionFactory<Oidc> {
 
-  public OidcConnectionFactory(String baseUrl, String clientId, String clientSecret) {
-    super("oidc", new OidcProvider(baseUrl, clientId, clientSecret), new OidcAdapter());
+  public OidcConnectionFactory(
+      String orchestratorUrl, String baseUrl, String clientId, String clientSecret) {
+    super(
+        "oidc",
+        new OidcProvider(orchestratorUrl, baseUrl, clientId, clientSecret),
+        new OidcAdapter());
   }
 }
