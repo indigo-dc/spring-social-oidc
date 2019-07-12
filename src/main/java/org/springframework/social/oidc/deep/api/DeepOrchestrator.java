@@ -1,9 +1,9 @@
-package org.springframework.social.oidc.api;
+package org.springframework.social.oidc.deep.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.ApiBinding;
 
-public interface Oidc extends ApiBinding {
+public interface DeepOrchestrator extends ApiBinding {
 
   OidcUserProfile getProfile();
 

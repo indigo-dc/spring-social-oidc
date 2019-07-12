@@ -1,15 +1,15 @@
-package org.springframework.social.oidc.connect;
+package org.springframework.social.oidc.deep.connect;
 
 import org.springframework.social.connect.ApiAdapter;
 import org.springframework.social.connect.ConnectionValues;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.UserProfileBuilder;
-import org.springframework.social.oidc.api.Oidc;
-import org.springframework.social.oidc.api.OidcUserProfile;
+import org.springframework.social.oidc.deep.api.DeepOrchestrator;
+import org.springframework.social.oidc.deep.api.OidcUserProfile;
 
-public class OidcAdapter implements ApiAdapter<Oidc> {
+public class OidcAdapter implements ApiAdapter<DeepOrchestrator> {
 
-  public boolean test(Oidc api) {
+  public boolean test(DeepOrchestrator api) {
     return api.isAuthorized() && api.getProfile() != null;
   }
 
@@ -19,7 +19,7 @@ public class OidcAdapter implements ApiAdapter<Oidc> {
    * @param api The API to get the user profile from.
    * @param values The user profile values to set from the API.
    */
-  public void setConnectionValues(Oidc api, ConnectionValues values) {
+  public void setConnectionValues(DeepOrchestrator api, ConnectionValues values) {
     OidcUserProfile profile = api.getProfile();
     values.setProviderUserId(profile.getSub());
     values.setDisplayName(profile.getGivenName() + " " + profile.getFamilyName());
@@ -31,7 +31,7 @@ public class OidcAdapter implements ApiAdapter<Oidc> {
    * @param api The API to request.
    * @return The user profile.
    */
-  public UserProfile fetchUserProfile(Oidc api) {
+  public UserProfile fetchUserProfile(DeepOrchestrator api) {
     OidcUserProfile profile = api.getProfile();
     return new UserProfileBuilder()
         .setId(profile.getSub())
@@ -42,5 +42,5 @@ public class OidcAdapter implements ApiAdapter<Oidc> {
         .build();
   }
 
-  public void updateStatus(Oidc api, String message) {}
+  public void updateStatus(DeepOrchestrator api, String message) {}
 }

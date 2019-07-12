@@ -1,7 +1,7 @@
-package org.springframework.social.oidc.connect;
+package org.springframework.social.oidc.deep.connect;
 
 import org.springframework.social.oauth2.OAuth2Template;
-import org.springframework.social.oidc.api.OidcConfiguration;
+import org.springframework.social.oidc.deep.api.OidcConfiguration;
 
 public class OidcTemplate extends OAuth2Template {
 
