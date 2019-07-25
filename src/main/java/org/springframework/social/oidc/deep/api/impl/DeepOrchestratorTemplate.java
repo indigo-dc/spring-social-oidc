@@ -4,7 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -78,7 +81,11 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
   }
 
   public ResponseEntity<String> callDeploy(String yamlTopology) {
-    return getRestTemplate().postForEntity(baseUrl, yamlTopology, String.class);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    HttpEntity<String> entity = new HttpEntity<String>(yamlTopology ,headers);
+    return getRestTemplate().postForEntity(baseUrl, entity, String.class);
   }
 
   public ResponseEntity<String> callDeploymentStatus(String deploymentId) {
