@@ -1,4 +1,4 @@
-package org.springframework.social.oidc.api;
+package org.springframework.social.oidc.deep.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

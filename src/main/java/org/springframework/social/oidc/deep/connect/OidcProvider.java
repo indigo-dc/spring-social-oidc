@@ -1,18 +1,22 @@
-package org.springframework.social.oidc.connect;
+package org.springframework.social.oidc.deep.connect;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
-import org.springframework.social.oidc.api.Oidc;
-import org.springframework.social.oidc.api.OidcConfiguration;
-import org.springframework.social.oidc.api.impl.OidcTemplate;
+import org.springframework.social.oidc.deep.api.DeepOrchestrator;
+import org.springframework.social.oidc.deep.api.OidcConfiguration;
+import org.springframework.social.oidc.deep.api.impl.DeepOrchestratorTemplate;
 import org.springframework.web.client.RestTemplate;
 
-public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
+import java.security.KeyStore;
+
+public class OidcProvider extends AbstractOAuth2ServiceProvider<DeepOrchestrator> {
 
   private static final Log logger = LogFactory.getLog(OidcProvider.class);
 
   private OidcConfiguration configuration;
+  private String orchestratorUrl;
+  private KeyStore orchestratorCert;
 
   /**
    * Creates a OIDC provider configuration.
@@ -21,14 +25,21 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
    * @param clientId Client ID to use.
    * @param clientSecret Client Secret to use.
    */
-  public OidcProvider(String providerUrl, String clientId, String clientSecret) {
+  public OidcProvider(
+      String orchestratorUrl,
+      KeyStore orchestratorCert,
+      String providerUrl,
+      String clientId,
+      String clientSecret) {
     super(createOidc2Template(providerUrl, clientId, clientSecret));
+    this.orchestratorUrl = orchestratorUrl;
+    this.orchestratorCert = orchestratorCert;
     configuration =
-        ((org.springframework.social.oidc.connect.OidcTemplate) getOAuthOperations())
+        ((org.springframework.social.oidc.deep.connect.OidcTemplate) getOAuthOperations())
             .getConfiguration();
   }
 
-  private static org.springframework.social.oidc.connect.OidcTemplate createOidc2Template(
+  private static org.springframework.social.oidc.deep.connect.OidcTemplate createOidc2Template(
       String providerUrl, String clientId, String clientSecret) {
     RestTemplate tempTemplate = new RestTemplate();
     OidcConfiguration configuration = new OidcConfiguration();
@@ -44,14 +55,25 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<Oidc> {
       configuration.setTokenEndpoint(providerUrl + "/token");
       configuration.setUserinfoEndpoint(providerUrl + "/userinfo");
     }
-    org.springframework.social.oidc.connect.OidcTemplate oauth2Template =
-        new org.springframework.social.oidc.connect.OidcTemplate(
+    org.springframework.social.oidc.deep.connect.OidcTemplate oauth2Template =
+        new org.springframework.social.oidc.deep.connect.OidcTemplate(
             configuration, clientId, clientSecret);
     oauth2Template.setUseParametersForClientAuthentication(true);
     return oauth2Template;
   }
 
-  public Oidc getApi(String accessToken) {
-    return new OidcTemplate(configuration, accessToken);
+  /**
+   * Spring Social method to get the actual Orchestrator API:
+   * @param accessToken The access token that will be passed by Spring Social.
+   * @return The instantiated API.
+   */
+  public DeepOrchestrator getApi(String accessToken) {
+    try {
+      return new DeepOrchestratorTemplate(
+          orchestratorUrl, orchestratorCert, configuration, accessToken);
+    } catch (Exception e) {
+      logger.error("Error reading orchestrator keystore", e);
+    }
+    return null;
   }
 }
