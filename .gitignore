@@ -123,3 +123,4 @@ buildNumber.properties
 /.idea/
 /.idea/libraries/
 .idea
+.idea/**

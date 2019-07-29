@@ -55,6 +55,15 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     }
   }
 
+  /**
+   * When the orchestrator is using an invalid certificate, this method can be called to accept the
+   * certificate.
+   *
+   * @param cert A JKS keystore containing the orchestrator certificate.
+   * @throws KeyStoreException The keystore is invalid.
+   * @throws NoSuchAlgorithmException A problem occurred opening the keystore.
+   * @throws KeyManagementException A problem occurred opening the keystore.
+   */
   public void setSslContext(KeyStore cert)
       throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
     if (cert != null) {
@@ -68,11 +77,21 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     }
   }
 
+  /**
+   * Returns the profile of the logged user.
+   *
+   * @return The profile of the logged user.
+   */
   public OidcUserProfile getProfile() {
     return getRestTemplate()
         .getForObject(configuration.getUserinfoEndpoint(), OidcUserProfile.class);
   }
 
+  /**
+   * Gets a list of deployments of the logged user.
+   *
+   * @return The list of deployments in plain text. It must be parsed by the calling client.
+   */
   public ResponseEntity<String> callGetDeployments() {
     URIBuilder builder = URIBuilder.fromUri(baseUrl);
     builder.queryParam("createdBy", "me");
@@ -80,19 +99,37 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     return getRestTemplate().getForEntity(builder.build().toString(), String.class);
   }
 
+  /**
+   * Deploys a template in the orchestrator.
+   *
+   * @param yamlTopology The yaml topology to deploy in plain text.
+   * @return The operation result in plain text. It must be parsed by the calling client.
+   */
   public ResponseEntity<String> callDeploy(String yamlTopology) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    HttpEntity<String> entity = new HttpEntity<String>(yamlTopology ,headers);
+    HttpEntity<String> entity = new HttpEntity<String>(yamlTopology, headers);
     return getRestTemplate().postForEntity(baseUrl, entity, String.class);
   }
 
+  /**
+   * Gets the status of a deployment.
+   *
+   * @param deploymentId The deployment identifier.
+   * @return The deployment status in plain text. It must be parsed by the calling client.
+   */
   public ResponseEntity<String> callDeploymentStatus(String deploymentId) {
     return getRestTemplate()
         .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId), String.class);
   }
 
+  /**
+   * Undeploys a deployment.
+   *
+   * @param deploymentId The deployment identifier.
+   * @return The operation result in plain text. It must be parsed by the calling client.
+   */
   public ResponseEntity<String> callUndeploy(String deploymentId) {
     RequestEntity<Void> requestEntity =
         new RequestEntity<Void>(

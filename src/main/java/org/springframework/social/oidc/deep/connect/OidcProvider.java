@@ -62,9 +62,15 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<DeepOrchestrator
     return oauth2Template;
   }
 
+  /**
+   * Spring Social method to get the actual Orchestrator API:
+   * @param accessToken The access token that will be passed by Spring Social.
+   * @return The instantiated API.
+   */
   public DeepOrchestrator getApi(String accessToken) {
     try {
-      return new DeepOrchestratorTemplate(orchestratorUrl, orchestratorCert, configuration, accessToken);
+      return new DeepOrchestratorTemplate(
+          orchestratorUrl, orchestratorCert, configuration, accessToken);
     } catch (Exception e) {
       logger.error("Error reading orchestrator keystore", e);
     }
