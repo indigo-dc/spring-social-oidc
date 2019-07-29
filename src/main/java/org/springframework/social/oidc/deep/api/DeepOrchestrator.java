@@ -37,4 +37,11 @@ public interface DeepOrchestrator extends ApiBinding {
    * @return The operation result in plain text. It must be parsed by the calling client.
    */
   ResponseEntity<String> callUndeploy(String deploymentId);
+
+  /**
+   * Gets the template description associated to a deployment.
+   * @param deploymentId The deployment identifier.
+   * @return The deployment template in plain text. It must be parsed by the calling client.
+   */
+  ResponseEntity<String> callGetTemplate(String deploymentId);
 }
