@@ -144,6 +144,7 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
    */
   public ResponseEntity<String> callGetTemplate(String deploymentId) {
     return getRestTemplate()
-            .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId + "/template"), String.class);
+            .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId + "/template"),
+                    String.class);
   }
 }
