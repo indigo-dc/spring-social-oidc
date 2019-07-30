@@ -136,4 +136,15 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
             HttpMethod.DELETE, URI.create(baseUrl.toString() + "/" + deploymentId));
     return getRestTemplate().exchange(requestEntity, String.class);
   }
+
+  /**
+   * Gets the template description associated to a deployment.
+   * @param deploymentId The deployment identifier.
+   * @return The deployment template in plain text. It must be parsed by the calling client.
+   */
+  public ResponseEntity<String> callGetTemplate(String deploymentId) {
+    return getRestTemplate()
+            .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId + "/template"),
+                    String.class);
+  }
 }
