@@ -15,24 +15,22 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<DeepOrchestrator
   private static final Log logger = LogFactory.getLog(OidcProvider.class);
 
   private OidcConfiguration configuration;
-  private String orchestratorUrl;
   private KeyStore orchestratorCert;
 
   /**
    * Creates a OIDC provider configuration.
    *
+   * @param orchestratorCert A keystore containing certificates for the orchestrators.
    * @param providerUrl The provider URL.
    * @param clientId Client ID to use.
    * @param clientSecret Client Secret to use.
    */
   public OidcProvider(
-      String orchestratorUrl,
       KeyStore orchestratorCert,
       String providerUrl,
       String clientId,
       String clientSecret) {
     super(createOidc2Template(providerUrl, clientId, clientSecret));
-    this.orchestratorUrl = orchestratorUrl;
     this.orchestratorCert = orchestratorCert;
     configuration =
         ((org.springframework.social.oidc.deep.connect.OidcTemplate) getOAuthOperations())
@@ -69,8 +67,7 @@ public class OidcProvider extends AbstractOAuth2ServiceProvider<DeepOrchestrator
    */
   public DeepOrchestrator getApi(String accessToken) {
     try {
-      return new DeepOrchestratorTemplate(
-          orchestratorUrl, orchestratorCert, configuration, accessToken);
+      return new DeepOrchestratorTemplate(orchestratorCert, configuration, accessToken);
     } catch (Exception e) {
       logger.error("Error reading orchestrator keystore", e);
     }
