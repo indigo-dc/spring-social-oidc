@@ -81,6 +81,14 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     return orchestrarorUrl + WS_PATH_DEPLOYMENTS;
   }
 
+  /**
+   * Adds a certificate to the existing keystore in memory.
+   *
+   * @param alias The alias to apply to this certificate. It must be unique. If the alias already
+   *     exists, the existing certificate will be replaced.
+   * @param cert The certificate to add.
+   * @throws KeyStoreException Thrown if something go wrong.
+   */
   public void addCertificate(String alias, Certificate cert)
       throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
     if (this.keystore != null) {
@@ -89,6 +97,12 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     }
   }
 
+  /**
+   * Removes a certificate from the existing keystore in memory.
+   *
+   * @param alias The alias of the certificate to remove.
+   * @throws KeyStoreException Thrown if something go wrong.
+   */
   public void removeCertificate(String alias)
       throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
     if (this.keystore != null) {
