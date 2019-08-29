@@ -23,16 +23,17 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 
 import javax.net.ssl.SSLContext;
-
-
 
 public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implements DeepOrchestrator {
 
   private static final Log logger = LogFactory.getLog(DeepOrchestratorTemplate.class);
 
   private OidcConfiguration configuration;
+
+  private KeyStore keystore;
 
   /** Web service path for deployments operations; It is appended to the orchestrator endpoint. */
   public static final String WS_PATH_DEPLOYMENTS = "/deployments";
@@ -44,9 +45,10 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
    * @param accessToken Obtained access token
    */
   public DeepOrchestratorTemplate(
-          KeyStore orchestratorCert, OidcConfiguration configuration, String accessToken)
+      KeyStore orchestratorCert, OidcConfiguration configuration, String accessToken)
       throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     super(accessToken);
+    this.keystore = orchestratorCert;
     this.configuration = configuration;
     if (orchestratorCert != null) {
       setSslContext(orchestratorCert);
@@ -78,6 +80,19 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
   private String baseUrl(String orchestrarorUrl) {
     return orchestrarorUrl + WS_PATH_DEPLOYMENTS;
   }
+
+  public void addCertificate(String alias, Certificate cert)
+      throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
+    this.keystore.setCertificateEntry(alias, cert);
+    setSslContext(this.keystore);
+  }
+
+  public void removeCertificate(String alias)
+      throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
+    this.keystore.deleteEntry(alias);
+    setSslContext(this.keystore);
+  }
+
   /**
    * Returns the profile of the logged user.
    *
