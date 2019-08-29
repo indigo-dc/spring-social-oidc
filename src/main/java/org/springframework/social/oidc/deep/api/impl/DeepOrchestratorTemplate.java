@@ -83,14 +83,18 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
 
   public void addCertificate(String alias, Certificate cert)
       throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
-    this.keystore.setCertificateEntry(alias, cert);
-    setSslContext(this.keystore);
+    if (this.keystore != null) {
+      this.keystore.setCertificateEntry(alias, cert);
+      setSslContext(this.keystore);
+    }
   }
 
   public void removeCertificate(String alias)
       throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
-    this.keystore.deleteEntry(alias);
-    setSslContext(this.keystore);
+    if (this.keystore != null) {
+      this.keystore.deleteEntry(alias);
+      setSslContext(this.keystore);
+    }
   }
 
   /**
