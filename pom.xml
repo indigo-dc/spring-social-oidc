@@ -36,8 +36,7 @@
             <artifactId>httpclient</artifactId>
             <version>4.3.6</version>
         </dependency>
-
-
+             
     </dependencies>
 
     <build>
@@ -64,7 +63,45 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                         <configuration>
+                                  <skip>true</skip>
+                         </configuration>
+                 </plugin>
+                 <plugin>
+                     <groupId>org.sonatype.plugins</groupId>
+                     <artifactId>nexus-staging-maven-plugin</artifactId>
+                     <version>1.5.1</version>
+                     <executions>
+                         <execution>
+                             <id>default-deploy</id>
+                             <phase>deploy</phase>
+                             <goals>
+                                 <goal>deploy</goal>
+                             </goals>
+                         </execution>
+                     </executions>
+                     <configuration>
+                          <serverId>nexus</serverId>
+                          <nexusUrl>https://repository.indigo-datacloud.eu/</nexusUrl>
+                          <skipStaging>true</skipStaging>
+                     </configuration>
+                 </plugin>
             </plugins>
     </build>
 
+    <distributionManagement>
+           <snapshotRepository>
+                <id>maven-snapshots</id>
+                <url>https://repository.indigo-datacloud.eu/repository/maven-snapshots/</url>
+           </snapshotRepository>
+           <repository>
+                <id>maven-releases</id>
+                <url>https://repository.indigo-datacloud.eu/repository/maven-releases/</url>
+           </repository>
+    </distributionManagement>
+              
 </project>
