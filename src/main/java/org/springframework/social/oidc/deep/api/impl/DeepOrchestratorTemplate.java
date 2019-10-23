@@ -18,10 +18,12 @@ import org.springframework.social.oidc.deep.api.OidcUserProfile;
 import org.springframework.social.support.URIBuilder;
 
 import java.net.URI;
+
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 
 import javax.net.ssl.SSLContext;
 
@@ -31,7 +33,8 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
 
   private OidcConfiguration configuration;
 
-  private URI baseUrl;
+  private KeyStore keystore;
+
   /** Web service path for deployments operations; It is appended to the orchestrator endpoint. */
   public static final String WS_PATH_DEPLOYMENTS = "/deployments";
 
@@ -42,14 +45,11 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
    * @param accessToken Obtained access token
    */
   public DeepOrchestratorTemplate(
-      String orchestratorBaseUrl,
-      KeyStore orchestratorCert,
-      OidcConfiguration configuration,
-      String accessToken)
+      KeyStore orchestratorCert, OidcConfiguration configuration, String accessToken)
       throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
     super(accessToken);
+    this.keystore = orchestratorCert;
     this.configuration = configuration;
-    this.baseUrl = URI.create(orchestratorBaseUrl + WS_PATH_DEPLOYMENTS);
     if (orchestratorCert != null) {
       setSslContext(orchestratorCert);
     }
@@ -77,6 +77,40 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
     }
   }
 
+  private String baseUrl(String orchestrarorUrl) {
+    return orchestrarorUrl + WS_PATH_DEPLOYMENTS;
+  }
+
+  /**
+   * Adds a certificate to the existing keystore in memory.
+   *
+   * @param alias The alias to apply to this certificate. It must be unique. If the alias already
+   *     exists, the existing certificate will be replaced.
+   * @param cert The certificate to add.
+   * @throws KeyStoreException Thrown if something go wrong.
+   */
+  public void addCertificate(String alias, Certificate cert)
+      throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
+    if (this.keystore != null) {
+      this.keystore.setCertificateEntry(alias, cert);
+      setSslContext(this.keystore);
+    }
+  }
+
+  /**
+   * Removes a certificate from the existing keystore in memory.
+   *
+   * @param alias The alias of the certificate to remove.
+   * @throws KeyStoreException Thrown if something go wrong.
+   */
+  public void removeCertificate(String alias)
+      throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException {
+    if (this.keystore != null) {
+      this.keystore.deleteEntry(alias);
+      setSslContext(this.keystore);
+    }
+  }
+
   /**
    * Returns the profile of the logged user.
    *
@@ -90,10 +124,11 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
   /**
    * Gets a list of deployments of the logged user.
    *
+   * @param orchestrarorUrl The URL of the DEEP orchestrator to contact.
    * @return The list of deployments in plain text. It must be parsed by the calling client.
    */
-  public ResponseEntity<String> callGetDeployments() {
-    URIBuilder builder = URIBuilder.fromUri(baseUrl);
+  public ResponseEntity<String> callGetDeployments(String orchestrarorUrl) {
+    URIBuilder builder = URIBuilder.fromUri(baseUrl(orchestrarorUrl));
     builder.queryParam("createdBy", "me");
 
     return getRestTemplate().getForEntity(builder.build().toString(), String.class);
@@ -102,49 +137,57 @@ public class DeepOrchestratorTemplate extends AbstractOAuth2ApiBinding implement
   /**
    * Deploys a template in the orchestrator.
    *
+   * @param orchestrarorUrl The URL of the DEEP orchestrator to contact.
    * @param yamlTopology The yaml topology to deploy in plain text.
    * @return The operation result in plain text. It must be parsed by the calling client.
    */
-  public ResponseEntity<String> callDeploy(String yamlTopology) {
+  public ResponseEntity<String> callDeploy(String orchestrarorUrl, String yamlTopology) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     HttpEntity<String> entity = new HttpEntity<String>(yamlTopology, headers);
-    return getRestTemplate().postForEntity(baseUrl, entity, String.class);
+    return getRestTemplate().postForEntity(baseUrl(orchestrarorUrl), entity, String.class);
   }
 
   /**
    * Gets the status of a deployment.
    *
+   * @param orchestrarorUrl The URL of the DEEP orchestrator to contact.
    * @param deploymentId The deployment identifier.
    * @return The deployment status in plain text. It must be parsed by the calling client.
    */
-  public ResponseEntity<String> callDeploymentStatus(String deploymentId) {
+  public ResponseEntity<String> callDeploymentStatus(String orchestrarorUrl, String deploymentId) {
     return getRestTemplate()
-        .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId), String.class);
+        .getForEntity(
+            URI.create(baseUrl(orchestrarorUrl).toString() + "/" + deploymentId), String.class);
   }
 
   /**
    * Undeploys a deployment.
    *
+   * @param orchestrarorUrl The URL of the DEEP orchestrator to contact.
    * @param deploymentId The deployment identifier.
    * @return The operation result in plain text. It must be parsed by the calling client.
    */
-  public ResponseEntity<String> callUndeploy(String deploymentId) {
+  public ResponseEntity<String> callUndeploy(String orchestrarorUrl, String deploymentId) {
     RequestEntity<Void> requestEntity =
         new RequestEntity<Void>(
-            HttpMethod.DELETE, URI.create(baseUrl.toString() + "/" + deploymentId));
+            HttpMethod.DELETE,
+            URI.create(baseUrl(orchestrarorUrl).toString() + "/" + deploymentId));
     return getRestTemplate().exchange(requestEntity, String.class);
   }
 
   /**
    * Gets the template description associated to a deployment.
+   *
+   * @param orchestrarorUrl The URL of the DEEP orchestrator to contact.
    * @param deploymentId The deployment identifier.
    * @return The deployment template in plain text. It must be parsed by the calling client.
    */
-  public ResponseEntity<String> callGetTemplate(String deploymentId) {
+  public ResponseEntity<String> callGetTemplate(String orchestrarorUrl, String deploymentId) {
     return getRestTemplate()
-            .getForEntity(URI.create(baseUrl.toString() + "/" + deploymentId + "/template"),
-                    String.class);
+        .getForEntity(
+            URI.create(baseUrl(orchestrarorUrl).toString() + "/" + deploymentId + "/template"),
+            String.class);
   }
 }

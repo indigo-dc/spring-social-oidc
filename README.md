@@ -15,13 +15,12 @@ Maven is needed to build the source code. To build a binary just execute `mvn cl
     public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer, Environment environment) {
 
             connectionFactoryConfigurer.addConnectionFactory(
-                    new OidcConnectionFactory(deepOrchestratorURL, certKeystore, issuer, clientId, clientSecret"));
+                    new OidcConnectionFactory(certKeystore, issuer, clientId, clientSecret));
     }
 ```
 
 Where:
-- `deepOrchestratorURL` is the base URL pointing to a DEEP orchestrator instance.
-- `certKeystore` is the location of a JKS keystore containing the orchestrator certificate in case it's self-signed or invalid. If the orchestrator has a valid certificate then this parameter can be null.
+- `certKeystore` is the location of a JKS keystore containing orchestrators certificates in case it's self-signed or invalid. If the orchestrator has a valid certificate then this parameter can be null.
 - `issuer` is the root URL of the IAM issuer instance 
 - `client-id` and `client-sectet` are the application client identifier and secret to use to authenticate through the code workflow.
 

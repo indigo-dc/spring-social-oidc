@@ -124,3 +124,7 @@ buildNumber.properties
 /.idea/libraries/
 .idea
 .idea/**
+.vscode
+.classpath
+.settings
+.project
