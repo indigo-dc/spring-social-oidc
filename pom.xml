@@ -6,7 +6,7 @@
 
     <groupId>org.springframework.social</groupId>
     <artifactId>spring-social-oidc-deep</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
 
     <properties>
         <jackson.version>2.9.5</jackson.version>
