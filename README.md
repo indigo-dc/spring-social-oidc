@@ -8,7 +8,12 @@ Maven is needed to build the source code. To build a binary just execute `mvn cl
 
 ## Use in a Spring project ##
 
-1. Add the generated jar to the Spring project classpath either by a dependency management tool like Maven or Gradle or copying the jar directly to the project's classpath.
+1. Add the generated jar to the Spring project classpath either by a dependency management tool like Maven or Gradle or copying the jar directly to the project's classpath. For maven the dependency is:
+```
+<groupId>org.springframework.social</groupId>
+<artifactId>spring-social-oidc-deep</artifactId>
+<version>1.4</version>
+```
 2. Follow the steps described in [Spring social documentation](https://docs.spring.io/spring-social/docs/1.1.4.RELEASE/reference/htmlsingle) to enable Spring Social in your project and create a SocialConfigurer and adding a `SocialConfigurer` class and add a connection factory like in this snippet:
 ```java
 @Override
